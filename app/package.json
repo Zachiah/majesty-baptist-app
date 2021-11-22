@@ -2,7 +2,7 @@
     "name": "majesty-baptist-app",
     "description": "TODO",
     "author": "Zachiah Sawyer",
-    "version": "v0.1.1",
+    "version": "v0.1.2",
     "license": "MIT",
     "main": "index.js",
     "devDependencies": {
