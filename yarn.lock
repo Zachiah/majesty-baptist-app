@@ -1529,7 +1529,7 @@ esbuild@^0.11.3:
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.11.23.tgz#c42534f632e165120671d64db67883634333b4b8"
   integrity sha512-iaiZZ9vUF5wJV8ob1tl+5aJTrwDczlvGP0JoMmnpC2B0ppiMCu8n8gmy5ZTGl5bcG081XBVn+U+jP+mPFm5T5Q==
 
-esbuild@^0.13.2:
+esbuild@^0.13.15, esbuild@^0.13.2:
   version "0.13.15"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.13.15.tgz#db56a88166ee373f87dbb2d8798ff449e0450cdf"
   integrity sha512-raCxt02HBKv8RJxE8vkTSCXGIyKHdEdGfUmiYb8wnabnaEmHzyW7DCHb5tEN0xU8ryqg5xw54mcwnYkC4x3AIw==
@@ -2981,6 +2981,11 @@ socks@^2.6.1:
   dependencies:
     ip "^1.1.5"
     smart-buffer "^4.1.0"
+
+solid-app-router@^0.1.12:
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/solid-app-router/-/solid-app-router-0.1.12.tgz#c24e480ec3ee6e6e68e01693ba39b2ffcfa1c6ac"
+  integrity sha512-3BeeJi+zJDRdKg2wCAamaeEFXPOk/X0cKfRIW6/jExKZnHEVo5Q1F9A+zXZv1X1r7wXi1opN7RvvUhWE1SwO4w==
 
 solid-icons@^0.3.2:
   version "0.3.2"

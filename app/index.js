@@ -18,17 +18,32 @@ var __toModule = (module2) => {
 };
 
 // src/electron_app/index.ts
-var import_electron = __toModule(require("electron"));
+var import_electron2 = __toModule(require("electron"));
 var import_path = __toModule(require("path"));
 var import_url = __toModule(require("url"));
+
+// src/electron_app/ipcCommunication.ts
+var import_electron = __toModule(require("electron"));
+var ipcCommunication_default = (app2) => {
+  import_electron.ipcMain.on("get-app-data-path", (event) => {
+    event.returnValue = app2.getPath("userData");
+  });
+};
+
+// src/electron_app/index.ts
 var isDevelopment = process.env.NODE_ENV === "development";
+var preloadPath = (0, import_path.join)(__dirname, "preload.js");
+console.log(preloadPath);
 function createWindow() {
-  const win = new import_electron.BrowserWindow({
+  const win = new import_electron2.BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      preload: preloadPath,
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true
     },
     show: false
   }).once("ready-to-show", () => {
@@ -41,15 +56,27 @@ function createWindow() {
     win.loadURL((0, import_url.pathToFileURL)((0, import_path.join)(__dirname, "./renderer/index.html")).toString());
   }
 }
-import_electron.app.whenReady().then(createWindow);
-import_electron.app.on("window-all-closed", () => {
+import_electron2.app.whenReady().then(createWindow);
+import_electron2.app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    import_electron.app.quit();
+    import_electron2.app.quit();
   }
 });
-import_electron.app.on("activate", () => {
-  if (import_electron.BrowserWindow.getAllWindows().length === 0) {
+import_electron2.app.on("activate", () => {
+  if (import_electron2.BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
+import_electron2.app.on("ready", () => {
+  const csp = isDevelopment ? ["default-src 'self' localhost:*; style-src 'unsafe-inline' *"] : ["default-src 'self'; style-src 'unsafe-inline' *"];
+  import_electron2.session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        "Content-Security-Policy": csp
+      }
+    });
+  });
+});
+ipcCommunication_default(import_electron2.app);
 //# sourceMappingURL=index.js.map
