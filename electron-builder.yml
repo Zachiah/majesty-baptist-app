@@ -1,0 +1,7 @@
+appId: com.zachiah.majesty_baptist_app
+productName: Majesty Baptist App
+copyright: Copyright © 2021 Zachiah Sawyer
+directories:
+  output: dist
+  buildResources: build
+  app: app
