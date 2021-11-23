@@ -1,0 +1,1 @@
+export const appDataPath = window.ipcRenderer.sendSync("get-app-data-path");

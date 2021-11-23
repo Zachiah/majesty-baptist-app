@@ -4,7 +4,6 @@ import {Routes, Route, Link} from "solid-app-router";
 
 
 const App: Component = () => {
-  console.log(window.ipcRenderer.sendSync("get-app-data-path"));
   return (
     <div class="p-4 bg-blue-400">
       <p>Header</p>
