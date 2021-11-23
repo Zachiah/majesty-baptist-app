@@ -1,1 +1,3 @@
-export const appDataPath = window.ipcRenderer.sendSync("get-app-data-path");
+
+
+export { default as livingHymns } from "../hymnary_scraper/hymns.json";

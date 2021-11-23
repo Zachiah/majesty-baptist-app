@@ -17,7 +17,7 @@ const parsePageHymns = (html) => {
 
   let objectRows = originalRows.map((row) => {
     return {
-      number: row.children[0].textContent,
+      number: parseInt(row.children[0].textContent),
       firstLine: row.children[1].textContent,
       title:
         row.children[2].textContent.substring(
@@ -26,6 +26,12 @@ const parsePageHymns = (html) => {
         ) || row.children[1].textContent,
     };
   });
+
+  objectRows = [...new Set(objectRows.map((row) => row.number))].map(
+    (number) => {
+      return objectRows.find((row) => row.number === number);
+    }
+  );
 
   return objectRows;
 };
@@ -56,7 +62,10 @@ async function main() {
     hymns = [...hymns, ...(await parsePageHymns(html))];
   }
 
-  fs.writeFileSync(join(__dirname, "hymns.json"), JSON.stringify(hymns,null,2));
+  fs.writeFileSync(
+    join(__dirname, "hymns.json"),
+    JSON.stringify(hymns, null, 2)
+  );
 }
 
 main();

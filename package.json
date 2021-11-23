@@ -4,8 +4,8 @@
   "description": "An app to help manage Majesty Baptist Church's Songs, Bulletins, Events and other things like that (:",
   "author": "Zachiah Ryan Sawyer",
   "scripts": {
-    "dev": "esbuild src/electron_app/preload.ts --outfile=node_modules/.electron-run/app/preload.js --bundle --external:electron && cross-env NODE_ENV=development elecrun ./src/electron_app/index.ts --vite ",
-    "build": "esbuild src/electron_app/preload.ts --outfile=app/preload.js --bundle --external:electron && elecrun build ./src/electron_app/index.ts && vite build",
+    "dev": "esbuild src/electron_app/preload.ts --outfile=node_modules/.electron-run/app/preload.js --bundle --platform=node --external:electron && cross-env NODE_ENV=development elecrun ./src/electron_app/index.ts --vite ",
+    "build": "esbuild src/electron_app/preload.ts --outfile=app/preload.js --bundle --platform=node --external:electron && elecrun build ./src/electron_app/index.ts && vite build",
     "clean": "elecrun clean",
     "postinstall": "electron-builder install-app-deps",
     "pack": "yarn run build && yarn run rebuild && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder -c ./electron-builder.yml --win --linux",
