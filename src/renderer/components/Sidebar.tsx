@@ -1,7 +1,6 @@
 import { NavLink } from "solid-app-router";
 import { Component, JSX } from "solid-js";
-import { FaSolidHome } from "solid-icons/fa";
-import { FaSolidMusic } from "solid-icons/fa";
+import { FaSolidHome ,FaSolidMusic,FaSolidCalendar} from "solid-icons/fa";
 
 const SidebarLink = (props: {
   href: string;
@@ -19,6 +18,7 @@ const Sidebar: Component = () => {
     <nav class="h-full bg-gray-700 flex flex-col">
       <SidebarLink href="/" icon={FaSolidHome} />
       <SidebarLink href="/hymns" icon={FaSolidMusic} />
+      <SidebarLink href="/calendar" icon={FaSolidCalendar} />
     </nav>
   );
 };
