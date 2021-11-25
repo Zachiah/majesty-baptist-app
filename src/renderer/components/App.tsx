@@ -10,7 +10,7 @@ const App: Component = () => {
     <div class="flex h-full">
       <Sidebar />
 
-      <main class="flex-grow overflow-auto" style="scrollbar-gutter: stable">
+      <main class="flex-grow overflow-auto" >
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/hymns" element={<Hymns />} />
