@@ -7,7 +7,7 @@ const SidebarLink = (props: {
   icon: (props: { class: string }) => JSX.Element;
 }): JSX.Element => {
   return (
-    <NavLink end href={props.href} class="p-4 text-gray-200 duration-200 cursor-pointer hover:text-gray-300 outline-none border border-transparent active:(text-gray-500 bg-gray-200) focus-visible:border-black" activeClass="!text-gray-500 !bg-gray-200" >
+    <NavLink end={props.href === "/"} href={props.href} class="p-4 text-gray-200 duration-200 cursor-pointer hover:text-gray-300 outline-none border border-transparent active:(text-gray-500 bg-gray-200) focus-visible:border-black" activeClass="!text-gray-500 !bg-gray-200" >
       <props.icon class="w-8 h-8" />
     </NavLink>
   );

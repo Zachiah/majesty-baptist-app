@@ -14,6 +14,8 @@ const App: Component = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/hymns" element={<Hymns />} />
+          <Route path="/calendar/:view/:timestamp" element={<CalendarPage />} />
+          <Route path="/calendar/:view" element={<CalendarPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
         </Routes>
       </main>

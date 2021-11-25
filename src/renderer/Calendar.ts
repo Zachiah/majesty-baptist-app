@@ -46,11 +46,18 @@ export class Calendar {
     return new Date(year, month - 1, day);
   }
 
-  getDate(date: string | Date): CalendarObjectRecord[] {
+  getDateObjects(date: string | Date): CalendarObjectRecord[] {
     if (typeof date !== "string") {
       date = Calendar.dateToDateString(date);
     }
     return this.#data.filter((d) => d.dateString === date);
+  }
+
+  getDate(date: Date) {
+    return {
+      objects: this.getDateObjects(date),
+      date: date,
+    }
   }
 
   getMonth(date: Date) {
@@ -60,13 +67,25 @@ export class Calendar {
       return week.map((day) => {
         if (day === 0) return null;
         return {
-          objects: this.getDate(new Date(date.getFullYear(), date.getMonth(), day)),
-          year: date.getFullYear(),
-          month: date.getMonth(),
-          day: day,
+          objects: this.getDateObjects(new Date(date.getFullYear(), date.getMonth(), day)),
+          date: new Date(date.getFullYear(), date.getMonth(), day),
         };
       });
     });
+  }
+
+  getWeek(date: Date) {
+    // set date to the first day of the week
+    date.setDate(date.getDate() - date.getDay());
+
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+      week.push(new Date(date.getFullYear(), date.getMonth(), date.getDate() + i));
+    }
+    return week.map(d => ({
+      objects: this.getDateObjects(d),
+      date: d
+    }))
   }
 
   // searchHistoryForObjects(object: CalendarObjectRecord): CalendarDateRecord[] {
