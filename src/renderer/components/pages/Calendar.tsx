@@ -1,4 +1,4 @@
-import { NavLink,Link, useNavigate, useParams } from "solid-app-router";
+import { NavLink, Link, useNavigate, useParams } from "solid-app-router";
 import dayjs from "dayjs";
 import {
   Component,
@@ -9,6 +9,7 @@ import {
   JSX,
   createMemo,
   createEffect,
+  createSignal,
 } from "solid-js";
 import {
   Calendar,
@@ -16,13 +17,36 @@ import {
   CalendarHymnRecord,
   CalendarObjectRecord,
   CalendarSermonRecord,
+  PartialCalendarObjectRecord,
 } from "../../Calendar";
-import { calendar, livingHymns } from "../../data";
-import { FaSolidArrowLeft, FaSolidArrowRight } from "solid-icons/fa";
+import { calendar, livingHymns, setCalendar } from "../../data";
+import {
+  FaSolidArrowLeft,
+  FaSolidArrowRight,
+  FaSolidMusic,
+  FaSolidPlus,
+} from "solid-icons/fa";
+import Dialog from "../DialogBase";
+
+const DAYS_IN_WEEK = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 const CalendarObjectComponent = (props: { record: CalendarObjectRecord }) => {
+  let [dialogOpen, setDialogOpen] = createSignal(false);
   return (
-    <div class="p-2">
+    <button
+      class="p-2 text-left"
+      onClick={() => {
+        setDialogOpen(true);
+      }}
+    >
       <Switch>
         <Match when={props.record.type === "sermon"}>
           {(props.record as CalendarSermonRecord).title}
@@ -34,6 +58,207 @@ const CalendarObjectComponent = (props: { record: CalendarObjectRecord }) => {
           #{(props.record as CalendarHymnRecord).number}
         </Match>
       </Switch>
+
+      <Dialog
+        open={dialogOpen()}
+        onClose={() => {
+          setDialogOpen(false);
+        }}
+      >
+        <CalendarObjectForm
+          initialObject={props.record}
+          onClose={() => {
+            setDialogOpen(false);
+          }}
+          onSave={(obj) => {
+            const index = calendar().findIndex((o) => {
+              return o.id === props.record.id;
+            });
+            console.log(props.record);
+            console.log(calendar());
+
+            console.log({ index });
+            setCalendar([...calendar().slice(0, index), obj]);
+          }}
+        />
+      </Dialog>
+    </button>
+  );
+};
+
+const CalendarObjectForm = (props: {
+  onClose: () => void;
+  onSave: (obj: CalendarObjectRecord) => void;
+  initialObject: PartialCalendarObjectRecord;
+}) => {
+  const [object, setObject] = createSignal<PartialCalendarObjectRecord>(
+    props.initialObject
+  );
+
+  createEffect(() => {
+    setObject(props.initialObject as PartialCalendarObjectRecord);
+  });
+
+  const valid = createMemo(() => {
+    if (object().type === "event") {
+      return !!object().title;
+    }
+    if (object().type === "sermon") {
+      return !!object().title;
+    }
+    if (object().type === "hymn") {
+      return !(object().number === undefined || object().number === null);
+    }
+    return false;
+  });
+  return (
+    <section class="bg-white w-80 max-w-full rounded-md shadow-lg p-2">
+      <div class="flex mb-2 gap-2">
+        <button
+          class="flex-1 bg-gray-200 p-2 rounded-md"
+          classList={{
+            "!bg-gray-400": object().type === "event",
+          }}
+          onClick={() => {
+            setObject({ ...object(), type: "event" });
+          }}
+        >
+          Event
+        </button>
+        <button
+          class="flex-1 bg-gray-200 p-2 rounded-md"
+          classList={{
+            "!bg-gray-400": object().type === "hymn",
+          }}
+          onClick={() => {
+            setObject({ ...object(), type: "hymn" });
+          }}
+        >
+          Hymn
+        </button>
+        <button
+          class="flex-1 bg-gray-200 p-2 rounded-md"
+          classList={{
+            "!bg-gray-400": object().type === "sermon",
+          }}
+          onClick={() => {
+            setObject({ ...object(), type: "sermon" });
+          }}
+        >
+          Sermon
+        </button>
+      </div>
+
+      <Switch>
+        <Match when={object().type === "event" || object().type === "sermon"}>
+        <label>
+            <p>Title</p>
+          <input
+            class="rounded-md p-2 w-full border-2 border-gray-700 outline-none focus:(transform scale-102)"
+            type="text"
+            value={(object() as CalendarSermonRecord).title ?? ""}
+            onInput={(e) => {
+              setObject({
+                ...object(),
+                title: e.currentTarget.value,
+              });
+            }}
+          />
+          </label>
+        </Match>
+
+        <Match when={object().type === "hymn"}>
+          <label>
+            <p>Number</p>
+          <input
+            class="rounded-md p-2 w-full border-2 border-gray-700 outline-none focus:(transform scale-102)"
+            type="number"
+            value={(object() as CalendarHymnRecord).number ?? 1}
+            onInput={(e) => {
+              setObject({
+                ...object(),
+                number: +e.currentTarget.value ?? 1,
+              });
+            }}
+          />
+
+
+          </label>
+        </Match>
+      </Switch>
+
+      <div class="flex mt-8">
+        <button
+          class="py-2 px-4 border-orange-400 border-2 rounded-lg"
+          onClick={() => {
+            const newValue: PartialCalendarObjectRecord = props.initialObject;
+            setObject(newValue);
+            props.onClose();
+          }}
+        >
+          Close
+        </button>
+        <button
+          class="py-2 px-4 bg-green-400 rounded-lg ml-auto"
+          classList={{
+            "!cursor-not-allowed !bg-gray-200": !valid()
+          }}
+          onClick={() => {
+            if (!valid()) return;
+            props.onSave(object() as CalendarObjectRecord);
+          }}
+        >
+          Save
+        </button>
+      </div>
+    </section>
+  );
+};
+
+const CalendarDayComponent = (props: {
+  date: Date;
+  objects: CalendarObjectRecord[];
+}) => {
+  const [dialogOpen, setDialogOpen] = createSignal(false);
+
+  return (
+    <div class="border-1 m-2 flex flex-col relative overflow-auto">
+      <button
+        class="absolute bottom-4 right-4 p-2 bg-gray-700 flex rounded-full text-gray-300"
+        onClick={() => {
+          setDialogOpen(true);
+        }}
+      >
+        <FaSolidPlus class="w-6 h-6 b" />
+      </button>
+
+      <Link href={`/calendar/day/${props.date.getTime()}`} class="p-2">
+        {dayjs(props.date).format("D")}
+      </Link>
+      <For each={props.objects}>
+        {(object) => <CalendarObjectComponent record={object} />}
+      </For>
+
+      <Dialog
+        open={dialogOpen()}
+        onClose={() => {
+          setDialogOpen(false);
+        }}
+      >
+        <CalendarObjectForm
+          onClose={() => {
+            setDialogOpen(false);
+          }}
+          onSave={(obj) => {
+            setCalendar([...calendar(), obj]);
+          }}
+          initialObject={{
+            id: Calendar.generateId(),
+            timestamp: props.date.getTime(),
+            type: "event",
+          }}
+        />
+      </Dialog>
     </div>
   );
 };
@@ -104,16 +329,6 @@ const CalendarPage = (props: {}): JSX.Element => {
     return "/calendar/day/" + nextDay.getTime();
   });
 
-  const daysInWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
   return (
     <div class="h-full flex flex-col">
       <header class="bg-gray-700 text-gray-200 flex items-center">
@@ -174,57 +389,35 @@ const CalendarPage = (props: {}): JSX.Element => {
       </header>
 
       <Switch>
-        <Match when={params.view === "month"}>
+        <Match when={params.view === "month" || params.view === "week"}>
           <section
             class="grid grid-cols-7 h-full p-2"
             style={`grid-template-rows: auto repeat(${
-              calendarMonth().length
+              params.view === "month" ? calendarMonth().length : 1
             }, 1fr)`}
           >
-            <For each={daysInWeek}>
+            <For each={DAYS_IN_WEEK}>
               {(day) => (
                 <div class="text-center p-4 h-min border-1 m-2">{day}</div>
               )}
             </For>
 
-            <For each={calendarMonth()}>
+            <For
+              each={
+                params.view === "month" ? calendarMonth() : [calendarWeek()]
+              }
+            >
               {(week) => (
                 <For each={week}>
                   {(day) => (
                     <Show when={day} fallback={<td class="border-1 m-2"></td>}>
-                      <div class="border-1 m-2 flex flex-col relative">
-                        <div class="absolute top-0 right-0 bg-gray-200">
-                          {day!.objects.length}
-                        </div>
-
-                        <Link href={`/calendar/day/${day?.date.getTime()}`} class="p-2">{dayjs(day!.date).format("D")}</Link>
-                        <For each={day!.objects}>
-                          {(object) => (
-                            <CalendarObjectComponent record={object} />
-                          )}
-                        </For>
-                      </div>
+                      <CalendarDayComponent
+                        objects={day!.objects}
+                        date={day!.date}
+                      />
                     </Show>
                   )}
                 </For>
-              )}
-            </For>
-          </section>
-        </Match>
-
-        <Match when={params.view === "week"}>
-          <section class="flex h-full p-4 gap-4">
-            <For each={calendarWeek()}>
-              {(day, index) => (
-                <div class="border-1 flex-grow p-2">
-                  <h2 class="p-2 text-center border-1">
-                    {daysInWeek[index()]}
-                  </h2>
-                  <p>{dayjs(day.date).format("DD/MM")}</p>
-                  <For each={day.objects}>
-                    {(object) => <CalendarObjectComponent record={object} />}
-                  </For>
-                </div>
               )}
             </For>
           </section>

@@ -1,8 +1,9 @@
 import calendarize from 'calendarize';
+import {v4 as uuid} from 'uuid';
 
 export interface CalendarObjectBase {
   id: string;
-  dateString: string;
+  timestamp: number;
 }
 
 export interface CalendarSermonRecord extends CalendarObjectBase {
@@ -25,6 +26,14 @@ export type CalendarObjectRecord =
   | CalendarEventRecord
   | CalendarHymnRecord;
 
+export type PartialCalendarObjectRecord = {
+  title?: string;
+  type: "sermon" | "event" | "hymn";
+  number?: number;
+  id?: string;
+  timestamp?: number;
+}
+
 export type CalendarRecord = CalendarObjectRecord[];
 
 export class Calendar {
@@ -34,23 +43,18 @@ export class Calendar {
     this.#data = data;
   }
 
-  static dateToDateString(date: Date): string {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${year}-${month}-${day}`;
+
+  static generateId() {
+    return uuid();
   }
 
-  static dateStringToDate(date: string): Date {
-    const [year, month, day] = date.split("-").map((s) => parseInt(s));
-    return new Date(year, month - 1, day);
-  }
 
-  getDateObjects(date: string | Date): CalendarObjectRecord[] {
-    if (typeof date !== "string") {
-      date = Calendar.dateToDateString(date);
+
+  getDateObjects(date: number | Date): CalendarObjectRecord[] {
+    if (typeof date !== "number") {
+      date = date.getTime();
     }
-    return this.#data.filter((d) => d.dateString === date);
+    return this.#data.filter((d) => d.timestamp === date);
   }
 
   getDate(date: Date) {

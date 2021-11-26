@@ -1,6 +1,6 @@
-import { createSignal } from "solid-js";
+import { Accessor, createSignal } from "solid-js";
 
-async function createDataSignal<T>(key: string, initialValue: T) {
+async function createDataSignal<T>(key: string, initialValue: T): Promise<[Accessor<T>, (newV: T) => void]> {
   if (typeof initialValue === "function") {
     throw new Error("Initial value cannot be a function");
   }
@@ -11,12 +11,13 @@ async function createDataSignal<T>(key: string, initialValue: T) {
 
   return [
     data,
-    async (value: (T extends Function ? never : T) | ((prevValue: T) => T)) => {
+    async (value: T) => {
       await window.electron.writeData(key, value);
 
-      setData(value);
+      // T can't be a function so no issue
+      setData(value as (T extends Function ? never : T) | ((prev?: any) => T) | undefined);
     },
-  ] as const;
+  ];
 }
 
 export default createDataSignal;
